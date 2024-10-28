@@ -1,0 +1,34 @@
+#!/usr/local/bin/python3
+
+import subprocess
+import argparse
+
+def run_rsync(sources, destination, dry_run=True):
+    for source in sources:
+        if dry_run:
+            command = f"rsync -anvv {source} {destination}"
+            print(f"Executing Dry Run for {source}:")
+        else:
+            command = f"rsync -avv {source} {destination}"
+            print(f"Executing Real Run for {source}:")
+
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        print(result.stdout)
+        if result.stderr:
+            print(f"Error: {result.stderr}")
+
+def main():
+    parser = argparse.ArgumentParser(description="Run rsync for backup with dry run and real run options.")
+    parser.add_argument("--real", action="store_true", help="Perform the real run instead of a dry run.")
+    args = parser.parse_args()
+
+    sources = [
+        "~/Library/Mobile\\ Documents/com\\~apple\\~CloudDocs/Documents/Applications/Obsidian",
+        #"~/Library/Mobile\\ Documents/com\\~apple\\~CloudDocs/Documents/Applications/AnotherFolder"
+    ]
+    destination = "~/Applications/Data/Backups/rsync"
+
+    run_rsync(sources, destination, dry_run=not args.real)
+
+if __name__ == "__main__":
+    main()
